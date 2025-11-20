@@ -3,10 +3,11 @@ using api.Etc;
 using api.Models.Requests;
 using api.Services;
 using dataccess;
+using dataccess.Models;
 
 namespace tests;
 
-public class SetupTests(MyDbContext ctx,
+public class SetupTests(AppDbContext ctx,
     ISeeder seeder,
     ITestOutputHelper outputHelper,
     IAuthService authService)

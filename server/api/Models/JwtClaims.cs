@@ -1,6 +1,6 @@
 namespace api.Models;
 
-public record JwtClaims(string Id)
+public record JwtClaims(Guid Id)
 {
-    public string Id { get; set; } = Id;
+    public Guid Id { get; set; } = Id;
 }

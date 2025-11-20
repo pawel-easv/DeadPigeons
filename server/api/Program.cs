@@ -21,7 +21,7 @@ public class Program
         });
         services.AddOpenApiDocument(config => { config.AddStringConstants(typeof(SieveConstants)); });
         services.AddCors();
-        services.AddScoped<ILibraryService, LibraryService>();
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<ISeeder, SieveTestSeeder>();
         services.AddExceptionHandler<GlobalExceptionHandler>();

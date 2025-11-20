@@ -5,6 +5,7 @@ using System.Text.Json;
 using api.Models;
 using api.Models.Requests;
 using dataccess;
+using dataccess.Models;
 using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
@@ -14,7 +15,7 @@ using ValidationException = Bogus.ValidationException;
 namespace api.Services;
 
 public class AuthService(
-    MyDbContext ctx,
+    AppDbContext ctx,
     ILogger<AuthService> logger,
     TimeProvider timeProvider,
     AppOptions appOptions) : IAuthService
@@ -43,7 +44,7 @@ public class AuthService(
             PropertyNameCaseInsensitive = true
         }) ?? throw new ValidationException("Authentication failed!");
 
-        _ = ctx.Libraryusers.FirstOrDefault(u => u.Id == jwtClaims.Id)
+        _ = ctx.Users.FirstOrDefault(u => u.Id == jwtClaims.Id)
             ?? throw new ValidationException("Authentication is valid, but user is not found!");
 
         return jwtClaims;
@@ -51,9 +52,9 @@ public class AuthService(
 
     public async Task<JwtResponse> Login(LoginRequestDto dto)
     {
-        var user = ctx.Libraryusers.FirstOrDefault(u => u.Email == dto.Email)
+        var user = ctx.Users.FirstOrDefault(u => u.Email == dto.Email)
                    ?? throw new ValidationException("User is not found!");
-        var passwordsMatch = user.Passwordhash ==
+        var passwordsMatch = user.PasswordHash==
                              SHA512.HashData(
                                      Encoding.UTF8.GetBytes(dto.Password + user.Salt))
                                  .Aggregate("", (current, b) => current + b.ToString("x2"));
@@ -68,23 +69,23 @@ public class AuthService(
     {
         Validator.ValidateObject(dto, new ValidationContext(dto), true);
 
-        var isEmailTaken = ctx.Libraryusers.Any(u => u.Email == dto.Email);
+        var isEmailTaken = ctx.Users.Any(u => u.Email == dto.Email);
         if (isEmailTaken)
             throw new ValidationException("Email is already taken");
 
-        var salt = Guid.NewGuid().ToString();
+        var salt = Guid.NewGuid();
         var hash = SHA512.HashData(
             Encoding.UTF8.GetBytes(dto.Password + salt));
-        var user = new Libraryuser
+        var user = new User()
         {
             Email = dto.Email,
-            Createdat = timeProvider.GetUtcNow().DateTime.ToUniversalTime(),
-            Id = Guid.NewGuid().ToString(),
+            CreatedAt = timeProvider.GetUtcNow().DateTime.ToUniversalTime(),
+            Id = Guid.NewGuid(),
             Salt = salt,
-            Passwordhash = hash.Aggregate("", (current, b) => current + b.ToString("x2")),
+            PasswordHash = hash.Aggregate("", (current, b) => current + b.ToString("x2")),
             Role = "User"
         };
-        ctx.Libraryusers.Add(user);
+        ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
 
         var token = CreateJwt(user);
@@ -101,10 +102,10 @@ public class AuthService(
             .MustVerifySignature();
     }
 
-    private string CreateJwt(Libraryuser user)
+    private string CreateJwt(User user)
     {
         return CreateJwtBuilder()
-            .AddClaim(nameof(Libraryuser.Id), user.Id)
+            .AddClaim(nameof(User.Id), user.Id)
             .Encode();
     }
 }

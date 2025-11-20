@@ -1,5 +1,6 @@
 using api.Models;
 using dataccess;
+using dataccess.Models;
 using Microsoft.EntityFrameworkCore;
 using NJsonSchema.CodeGeneration.TypeScript;
 using NSwag;
@@ -150,11 +151,11 @@ public static class DiExtensions
             postgreSqlContainer.StartAsync().GetAwaiter().GetResult();
             var connectionString = postgreSqlContainer.GetConnectionString();
             Console.WriteLine("Connecting to DB: " + connectionString);
-            services.AddDbContext<MyDbContext>((services, options) => { options.UseNpgsql(connectionString); });
+            services.AddDbContext<AppDbContext>((services, options) => { options.UseNpgsql(connectionString); });
         }
         else
         {
-            services.AddDbContext<MyDbContext>(
+            services.AddDbContext<AppDbContext>(
                 (services, options) => { options.UseNpgsql(services.GetRequiredService<AppOptions>().Db); },
                 ServiceLifetime.Transient);
         }

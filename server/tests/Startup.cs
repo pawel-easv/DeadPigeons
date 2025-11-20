@@ -1,5 +1,6 @@
 using api;
 using dataccess;
+using dataccess.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -14,17 +15,17 @@ public class Startup
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
         Program.ConfigureServices(services);
-        services.RemoveAll(typeof(MyDbContext));
-        services.AddScoped<MyDbContext>(factory =>
+        services.RemoveAll(typeof(AppDbContext));
+        services.AddScoped<AppDbContext>(factory =>
         {
             var postgreSqlContainer = new PostgreSqlBuilder().Build();
             postgreSqlContainer.StartAsync().GetAwaiter().GetResult();
             var connectionString = postgreSqlContainer.GetConnectionString();
-            var options = new DbContextOptionsBuilder<MyDbContext>()
+            var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseNpgsql(connectionString)
                 .Options;
 
-            var ctx = new MyDbContext(options);
+            var ctx = new AppDbContext(options);
             ctx.Database.EnsureCreated();
             return ctx;
         });

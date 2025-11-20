@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace api.Models;
+namespace dataccess.Models;
 
 public partial class Transaction
 {
