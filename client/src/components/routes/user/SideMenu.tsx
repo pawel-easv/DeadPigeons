@@ -1,8 +1,7 @@
 import {faHouse} from "@fortawesome/free-regular-svg-icons/faHouse";
 import HistoryIcon from "../../../assets/history-icon.svg"
 import TicketIcon from "../../../assets/ticket-icon.svg"
-
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import HomeIcon from "../../../assets/home-icon.svg";
 
 export default function SideMenu() {
     return (
@@ -10,7 +9,7 @@ export default function SideMenu() {
             <div className="flex flex-col h-full w-[22vw] bg-dark-beige p-5 gap-5
                 border-r border-border-gray">
                 <div className="flex flex-row menu-item">
-                    <FontAwesomeIcon icon={faHouse} />
+                    <img src={HomeIcon} alt = "UserView Icon" className="h-5"/>
                     <span>Dashboard</span>
                 </div>
                 <div className="flex flex-row menu-item">

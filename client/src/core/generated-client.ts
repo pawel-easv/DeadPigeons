@@ -125,6 +125,285 @@ export class AuthClient {
     }
 }
 
+export class BoardsClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getMyBoards(includeDeleted: boolean | undefined): Promise<Board[]> {
+        let url_ = this.baseUrl + "/api/Boards?";
+        if (includeDeleted === null)
+            throw new globalThis.Error("The parameter 'includeDeleted' cannot be null.");
+        else if (includeDeleted !== undefined)
+            url_ += "includeDeleted=" + encodeURIComponent("" + includeDeleted) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetMyBoards(_response);
+        });
+    }
+
+    protected processGetMyBoards(response: Response): Promise<Board[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Board[]>(null as any);
+    }
+
+    createBoard(dto: CreateBoardDto): Promise<Board> {
+        let url_ = this.baseUrl + "/api/Boards";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreateBoard(_response);
+        });
+    }
+
+    protected processCreateBoard(response: Response): Promise<Board> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Board>(null as any);
+    }
+
+    getBoard(id: string | undefined): Promise<Board> {
+        let url_ = this.baseUrl + "/api/Boards/GetBoard?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetBoard(_response);
+        });
+    }
+
+    protected processGetBoard(response: Response): Promise<Board> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Board>(null as any);
+    }
+
+    updateBoard(id: string | undefined, dto: UpdateBoardDto): Promise<Board> {
+        let url_ = this.baseUrl + "/api/Boards/UpdateBoard?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dto);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processUpdateBoard(_response);
+        });
+    }
+
+    protected processUpdateBoard(response: Response): Promise<Board> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board;
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Board>(null as any);
+    }
+
+    deleteBoard(id: string | undefined): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Boards/DeleteBoard?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "DELETE",
+            headers: {
+                "Accept": "application/octet-stream"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processDeleteBoard(_response);
+        });
+    }
+
+    protected processDeleteBoard(response: Response): Promise<FileResponse> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200 || status === 206) {
+            const contentDisposition = response.headers ? response.headers.get("content-disposition") : undefined;
+            let fileNameMatch = contentDisposition ? /filename\*=(?:(\\?['"])(.*?)\1|(?:[^\s]+'.*?')?([^;\n]*))/g.exec(contentDisposition) : undefined;
+            let fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[3] || fileNameMatch[2] : undefined;
+            if (fileName) {
+                fileName = decodeURIComponent(fileName);
+            } else {
+                fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
+                fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
+            }
+            return response.blob().then(blob => { return { fileName: fileName, data: blob, status: status, headers: _headers }; });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<FileResponse>(null as any);
+    }
+
+    getActiveRepeatingBoards(): Promise<Board[]> {
+        let url_ = this.baseUrl + "/api/Boards/GetActiveRepeatingBoards";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetActiveRepeatingBoards(_response);
+        });
+    }
+
+    protected processGetActiveRepeatingBoards(response: Response): Promise<Board[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Board[]>(null as any);
+    }
+
+    getBoardsForCurrentGameWeek(year: number | undefined, week: number | undefined): Promise<Board[]> {
+        let url_ = this.baseUrl + "/api/Boards/GetBoardsForCurrentGameWeek?";
+        if (year === null)
+            throw new globalThis.Error("The parameter 'year' cannot be null.");
+        else if (year !== undefined)
+            url_ += "year=" + encodeURIComponent("" + year) + "&";
+        if (week === null)
+            throw new globalThis.Error("The parameter 'week' cannot be null.");
+        else if (week !== undefined)
+            url_ += "week=" + encodeURIComponent("" + week) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetBoardsForCurrentGameWeek(_response);
+        });
+    }
+
+    protected processGetBoardsForCurrentGameWeek(response: Response): Promise<Board[]> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as Board[];
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<Board[]>(null as any);
+    }
+}
+
 export class UsersClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -287,11 +566,12 @@ export class UsersClient {
         return Promise.resolve<User>(null as any);
     }
 
-    deleteUser(id: string, permanent: boolean | undefined): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/api/Users/{id}?";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+    deleteUser(id: string | undefined, permanent: boolean | undefined): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/api/Users/DeleteUser?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
         if (permanent === null)
             throw new globalThis.Error("The parameter 'permanent' cannot be null.");
         else if (permanent !== undefined)
@@ -439,9 +719,45 @@ export interface JwtClaims {
     id: string;
 }
 
+export interface Board {
+    id: string;
+    userId: string;
+    numbers: number[];
+    price: number;
+    repeating: boolean;
+    createdAt: string;
+    updatedAt: string;
+    deleted: boolean;
+    boardPlays: BoardPlay[];
+    user: User;
+}
+
+export interface BoardPlay {
+    id: string;
+    boardId: string;
+    gameId: string;
+    isWinner: boolean;
+    createdAt: string;
+    deleted: boolean;
+    board: Board;
+    game: Game;
+}
+
+export interface Game {
+    id: string;
+    week: number;
+    year: number;
+    active: boolean;
+    winningNumbers: number[] | undefined;
+    createdAt: string | undefined;
+    publishedAt: string | undefined;
+    deleted: boolean;
+    boardPlays: BoardPlay[];
+}
+
 export interface User {
     id: string;
-    deleted: boolean | undefined;
+    deleted: boolean;
     firstName: string;
     lastName: string;
     email: string;
@@ -455,43 +771,6 @@ export interface User {
     transactions: Transaction[];
 }
 
-export interface Board {
-    id: string;
-    userId: string;
-    numbers: number[];
-    fieldCount: number | undefined;
-    price: number;
-    repeating: boolean | undefined;
-    createdAt: string | undefined;
-    updatedAt: string | undefined;
-    deleted: boolean | undefined;
-    boardPlays: BoardPlay[];
-    user: User;
-}
-
-export interface BoardPlay {
-    id: string;
-    boardId: string;
-    gameId: string;
-    isWinner: boolean | undefined;
-    createdAt: string | undefined;
-    deleted: boolean | undefined;
-    board: Board;
-    game: Game;
-}
-
-export interface Game {
-    id: string;
-    week: number;
-    year: number;
-    active: boolean | undefined;
-    winningNumbers: number[] | undefined;
-    createdAt: string | undefined;
-    publishedAt: string | undefined;
-    deleted: boolean | undefined;
-    boardPlays: BoardPlay[];
-}
-
 export interface Transaction {
     id: string;
     userId: string | undefined;
@@ -502,6 +781,19 @@ export interface Transaction {
     deleted: boolean | undefined;
     boardId: string;
     user: User | undefined;
+}
+
+export interface CreateBoardDto {
+    userId: string;
+    numbers: number[];
+    price: number;
+    repeating: boolean;
+}
+
+export interface UpdateBoardDto {
+    numbers: number[];
+    price: number;
+    repeating: boolean;
 }
 
 export interface UpdateUserRequest {

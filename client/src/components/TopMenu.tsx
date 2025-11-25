@@ -1,4 +1,4 @@
-import LogoImage from '../../../assets/logo.png'
+import LogoImage from '../assets/logo.png'
 
 import {useNavigate} from "react-router";
 import {faArrowRightFromBracket} from "@fortawesome/free-solid-svg-icons";

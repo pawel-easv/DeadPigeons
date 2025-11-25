@@ -1,5 +1,5 @@
 import {Outlet} from "react-router";
-import CurrentLotteryPanel from "@components/routes/home/CurrentLotteryPanel.tsx";
+import CurrentLotteryPanel from "@components/routes/user/CurrentLotteryPanel.tsx";
 
 export default function Dashboard() {
     return (
