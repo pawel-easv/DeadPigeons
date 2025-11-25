@@ -13,11 +13,16 @@
     "graph": "npx depcruise src --include-only \"^src\" --output-type dot | dot -T svg > dependency-graph.svg"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.1.0",
+    "@fortawesome/free-brands-svg-icons": "^7.1.0",
+    "@fortawesome/free-regular-svg-icons": "^7.1.0",
+    "@fortawesome/free-solid-svg-icons": "^7.1.0",
+    "@fortawesome/react-fontawesome": "^3.1.0",
     "@tailwindcss/vite": "^4.1.13",
     "daisyui": "^5.1.12",
     "dotnet-json-refs": "^1.0.0",
     "jotai": "^2.14.0",
-    "jotai-devtools": "^0.13.0",
+    "jotai-devtools": "^0.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hot-toast": "^2.6.0",

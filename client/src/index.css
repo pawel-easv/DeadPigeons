@@ -3,3 +3,40 @@
 @plugin "daisyui" {
     themes: all;
 }
+
+@theme {
+    --color-cream-red: #D01F33;
+
+    --color-light-beige: #F7F4EF;
+    --color-dark-beige: #E8E5DD;
+    --color-darker-beige: #F0EBE3;
+
+    --color-border-gray: #D8D4CC;
+    --color-text-gray: #4B4B4B;
+
+    --color-shadow-soft: rgba(0, 0, 0, 0.05);
+
+}
+.menu-item {
+    @apply
+    flex flex-row items-center justify-center gap-4 p-2 text-xl
+    bg-light-beige
+    border border-transparent
+    rounded-md
+    cursor-pointer
+    transition-all duration-150
+    border-2;
+}
+
+.menu-item:hover {
+    @apply
+    border-border-gray
+
+}
+.menu-item-active {
+    @apply
+    bg-light-beige
+    border border-border-gray
+    shadow-sm
+    rounded-md;
+}
