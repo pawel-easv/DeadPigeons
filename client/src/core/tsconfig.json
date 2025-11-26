@@ -3,7 +3,8 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "../vite-env.d.ts"
+    "../vite-env.d.ts",
+    "../utilities/customFetch.ts"
   ],
   "references": []
 }

@@ -20,7 +20,7 @@
 .menu-item {
     @apply
     flex flex-row items-center justify-center gap-4 p-2 text-xl
-    bg-light-beige
+    bg-white
     border border-transparent
     rounded-md
     cursor-pointer
@@ -39,4 +39,246 @@
     border border-border-gray
     shadow-sm
     rounded-md;
+}
+
+.statistics-smaller-text{
+    @apply text-sm text-gray-600 mb-1
+}
+
+.statistics-bigger-text{
+    @apply text-3xl font-bold text-gray-800
+}
+
+.statistics-card{
+    @apply bg-white p-6 rounded-lg shadow border-l-4
+}
+
+.user-dashboard {
+    height: 100%;
+    width: 100%;
+    background-color: var(--darker-beige);
+    overflow-y: auto;
+}
+
+.lottery-panel {
+    background: linear-gradient(135deg, #f5f3ef 0%, #e8e5df 100%);
+    min-height: 300px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.lottery-panel-content {
+    max-width: 900px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.lottery-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin: 0;
+}
+
+.lottery-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 700px;
+}
+
+.lottery-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detail-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.detail-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.detail-value.highlight {
+    color: #dc2626;
+    font-size: 1.5rem;
+}
+
+.winning-numbers-small {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.number-badge-small {
+    background-color: #dc2626;
+    color: white;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+.btn-join {
+    background-color: #16a34a;
+    color: white;
+    padding: 1rem 3rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px rgba(22, 163, 74, 0.3);
+}
+
+.btn-join:hover {
+    background-color: #15803d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(22, 163, 74, 0.4);
+}
+
+.status-closed {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background-color: #f3f4f6;
+    border-radius: 0.75rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.status-icon {
+    font-size: 1.5rem;
+}
+
+.boards-panel {
+    padding: 2.5rem;
+}
+
+.boards-title {
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.boards-empty {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.boards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.board-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.board-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.board-price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #16a34a;
+}
+
+.badge-repeating {
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.board-numbers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.board-number {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+}
+
+.board-footer {
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.board-date {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .lottery-title {
+        font-size: 1.875rem;
+    }
+
+    .lottery-info {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .btn-join {
+        width: 100%;
+        padding: 0.875rem 2rem;
+    }
+
+    .boards-panel {
+        padding: 1.5rem;
+    }
+
+    .boards-grid {
+        grid-template-columns: 1fr;
+    }
 }

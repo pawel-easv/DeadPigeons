@@ -1,22 +1,67 @@
 import { useState } from "react";
 import LoginImage from '../../assets/login.png'
-import { authApi } from '@utilities/authApi.ts'
+import authApi from '@utilities/authApi.ts'
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
+import { AdminDashboardPath, UserViewPath } from "@components/App.tsx";
 
 export default function Login() {
+    const navigate = useNavigate();
+    const auth = authApi();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async () => {
+        if (!email || !password) {
+            toast.error("Please enter email and password");
+            return;
+        }
+
+        setIsLoading(true);
+
         try {
-            const response = await authApi.login({
+            const response = await auth.login({
                 email,
                 password
             });
 
+            if (!response?.token) {
+                toast.error("Login failed. Please try again.");
+                setIsLoading(false);
+                return;
+            }
+
+            // Wait a tiny bit for token to be set in localStorage
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Now get user info
+            const user = await auth.whoAmI();
+
+            if (!user) {
+                toast.error("Failed to get user information");
+                setIsLoading(false);
+                return;
+            }
+
+            // Navigate based on role
+            if (user.role === "Admin") {
+                navigate(AdminDashboardPath);
+            } else {
+                navigate(UserViewPath);
+            }
 
         } catch (err) {
             console.error("Login error:", err);
-            alert("Invalid email or password");
+            toast.error("Invalid email or password");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleLogin();
         }
     };
 
@@ -26,14 +71,20 @@ export default function Login() {
             style={{ backgroundImage: `url(${LoginImage})` }}
         >
             <div className="credentials-container flex flex-col mt-25 gap-10">
+                <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
+                    Dead Pigeons Login
+                </h1>
 
                 <div className="email-field-container flex flex-col justify-center items-center">
                     <label className="label text-black font-semibold">Email</label>
                     <input
-                        type="text"
+                        type="email"
                         className="input h-[5vh] w-[20vw]"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        disabled={isLoading}
+                        autoComplete="email"
                     />
                 </div>
 
@@ -44,16 +95,19 @@ export default function Login() {
                         className="input h-[5vh] w-[20vw]"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        disabled={isLoading}
+                        autoComplete="current-password"
                     />
                 </div>
 
                 <button
-                    className="btn bg-green-600 border-0 text-white"
+                    className="btn bg-green-600 border-0 text-white hover:bg-green-700 disabled:bg-gray-400"
                     onClick={handleLogin}
+                    disabled={isLoading}
                 >
-                    Login
+                    {isLoading ? "Logging in..." : "Login"}
                 </button>
-
             </div>
         </div>
     );

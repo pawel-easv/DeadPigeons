@@ -1,4 +1,5 @@
 import LogoImage from '../assets/logo.png'
+import authApi from '@utilities/authApi.ts';
 
 import {useNavigate} from "react-router";
 import {faArrowRightFromBracket} from "@fortawesome/free-solid-svg-icons";
@@ -6,6 +7,13 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export default function TopMenu() {
     const navigate = useNavigate();
+    const { logout } = authApi();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
+
     return (
         <div className="flex w-full justify-between items-center px-10 py-5
                 bg-dark-beige border-b border-border-gray">
@@ -15,7 +23,7 @@ export default function TopMenu() {
                 <span>Dead Pigeons</span>
             </div>
 
-            <div className="btn btn-primary bg-cream-red h-14 w-18">
+            <div className="btn btn-primary bg-cream-red h-14 w-18" onClick={handleLogout}>
                 <FontAwesomeIcon icon={faArrowRightFromBracket} />
             </div>
         </div>
