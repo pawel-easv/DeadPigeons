@@ -7,7 +7,7 @@ public partial class User
 {
     public Guid Id { get; set; }
 
-    public bool? Deleted { get; set; }
+    public bool Deleted { get; set; }
 
     public string FirstName { get; set; } = null!;
 

@@ -9,4 +9,5 @@ public interface IAuthService
 
     Task<JwtResponse> Login(LoginRequestDto dto);
     Task<JwtResponse> Register(RegisterRequestDto dto);
+    Task<JwtResponse> CreateFirstAdminIfNoneExists(RegisterRequestDto dto);
 }

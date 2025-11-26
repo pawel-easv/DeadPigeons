@@ -19,7 +19,7 @@ public partial class Transaction
 
     public bool? Deleted { get; set; }
 
-    public virtual ICollection<Board> Boards { get; set; } = new List<Board>();
+    public Guid BoardId { get; set; }
 
     public virtual User? User { get; set; }
 }

@@ -17,8 +17,6 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Board> Boards { get; set; }
 
-    public virtual DbSet<BoardPlay> BoardPlays { get; set; }
-
     public virtual DbSet<Game> Games { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
@@ -48,60 +46,26 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Deleted)
                 .HasDefaultValue(false)
                 .HasColumnName("deleted");
-            entity.Property(e => e.FieldCount)
-                .HasComputedColumnSql("array_length(numbers, 1)", true)
-                .HasColumnName("field_count");
+            entity.Property(e => e.GameId).HasColumnName("game_id");
             entity.Property(e => e.Numbers).HasColumnName("numbers");
             entity.Property(e => e.Price).HasColumnName("price");
             entity.Property(e => e.Repeating)
                 .HasDefaultValue(false)
                 .HasColumnName("repeating");
-            entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.Transaction).WithMany(p => p.Boards)
-                .HasForeignKey(d => d.TransactionId)
-                .HasConstraintName("boards_transaction_id_fkey");
+            entity.HasOne(d => d.Game).WithMany(p => p.Boards)
+                .HasForeignKey(d => d.GameId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("boards_games_id_fk");
 
             entity.HasOne(d => d.User).WithMany(p => p.Boards)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("boards_player_id_fkey");
-        });
-
-        modelBuilder.Entity<BoardPlay>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("board_play_pkey");
-
-            entity.ToTable("board_play");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("id");
-            entity.Property(e => e.BoardId).HasColumnName("board_id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("created_at");
-            entity.Property(e => e.Deleted)
-                .HasDefaultValue(false)
-                .HasColumnName("deleted");
-            entity.Property(e => e.GameId).HasColumnName("game_id");
-            entity.Property(e => e.IsWinner)
-                .HasDefaultValue(false)
-                .HasColumnName("is_winner");
-
-            entity.HasOne(d => d.Board).WithMany(p => p.BoardPlays)
-                .HasForeignKey(d => d.BoardId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("board_play_board_id_fkey");
-
-            entity.HasOne(d => d.Game).WithMany(p => p.BoardPlays)
-                .HasForeignKey(d => d.GameId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("board_play_game_id_fkey");
         });
 
         modelBuilder.Entity<Game>(entity =>
@@ -141,6 +105,7 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Approved)
                 .HasDefaultValue(false)
                 .HasColumnName("approved");
+            entity.Property(e => e.BoardId).HasColumnName("board_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
@@ -164,24 +129,18 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
-            entity.Property(e => e.CreatedAt)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.Deleted)
                 .HasDefaultValue(false)
                 .HasColumnName("deleted");
-            entity.Property(e => e.DeletedAt)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("deleted_at");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.FirstName).HasColumnName("first_name");
             entity.Property(e => e.LastName).HasColumnName("last_name");
             entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
             entity.Property(e => e.Role).HasColumnName("role");
             entity.Property(e => e.Salt).HasColumnName("salt");
-            entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
         });
 
         OnModelCreatingPartial(modelBuilder);

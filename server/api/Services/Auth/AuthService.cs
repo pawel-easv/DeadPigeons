@@ -10,6 +10,7 @@ using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Serializers;
+using Microsoft.EntityFrameworkCore;
 using ValidationException = Bogus.ValidationException;
 
 namespace api.Services;
@@ -22,7 +23,7 @@ public class AuthService(
 {
     public async Task<JwtClaims> VerifyAndDecodeToken(string token)
     {
-        if (string.IsNullOrWhiteSpace(token))
+        if (token == null)
             throw new ValidationException("No token attached!");
 
         var builder = CreateJwtBuilder();
@@ -67,31 +68,73 @@ public class AuthService(
 
     public async Task<JwtResponse> Register(RegisterRequestDto dto)
     {
+        // Validate input DTO
         Validator.ValidateObject(dto, new ValidationContext(dto), true);
 
-        var isEmailTaken = ctx.Users.Any(u => u.Email == dto.Email);
-        if (isEmailTaken)
+        // Check if email is taken
+        if (ctx.Users.Any(u => u.Email == dto.Email))
             throw new ValidationException("Email is already taken");
 
+        // Generate salt & hash password
         var salt = Guid.NewGuid();
-        var hash = SHA512.HashData(
-            Encoding.UTF8.GetBytes(dto.Password + salt));
+        var hashBytes = SHA512.HashData(Encoding.UTF8.GetBytes(dto.Password + salt));
+        var passwordHash = string.Concat(hashBytes.Select(b => b.ToString("x2")));
+
         var user = new User()
         {
-            Email = dto.Email,
-            CreatedAt = timeProvider.GetUtcNow().DateTime.ToUniversalTime(),
             Id = Guid.NewGuid(),
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email,
+            CreatedAt = DateTime.UtcNow,
             Salt = salt,
-            PasswordHash = hash.Aggregate("", (current, b) => current + b.ToString("x2")),
-            Role = "User"
+            PasswordHash = passwordHash,
+            Role = "User",
+            Deleted = false
         };
+
         ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
 
-        var token = CreateJwt(user);
-        return new JwtResponse(token);
+        var tokenForUser = CreateJwt(user);
+        return new JwtResponse(tokenForUser);
     }
 
+    public async Task<JwtResponse> CreateFirstAdminIfNoneExists(RegisterRequestDto dto)
+    {
+        if (await ctx.Users.AnyAsync())
+        {
+            throw new ValidationException("System already initialized. Cannot create first admin.");
+        }
+        
+        Validator.ValidateObject(dto, new ValidationContext(dto), true);
+        
+        if (dto.Password.Length < 8)
+            throw new ValidationException("First admin password must be at least 8 characters.");
+
+        var salt = Guid.NewGuid();
+        var hashBytes = SHA512.HashData(Encoding.UTF8.GetBytes(dto.Password + salt));
+        var passwordHash = string.Concat(hashBytes.Select(b => b.ToString("x2")));
+
+        var admin = new User
+        {
+            Id = Guid.NewGuid(),
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            Email = dto.Email.ToLowerInvariant().Trim(),
+            Salt = salt,
+            PasswordHash = passwordHash,
+            Role = "Admin",
+            CreatedAt = DateTime.UtcNow,
+            Deleted = false
+        };
+
+        ctx.Users.Add(admin);
+        await ctx.SaveChangesAsync();
+
+        var token = CreateJwt(admin);
+        return new JwtResponse(token);
+    }
     private JwtBuilder CreateJwtBuilder()
     {
         return JwtBuilder.Create()
@@ -106,6 +149,8 @@ public class AuthService(
     {
         return CreateJwtBuilder()
             .AddClaim(nameof(User.Id), user.Id)
+            .AddClaim(nameof(User.Role), user.Role)
             .Encode();
     }
+
 }

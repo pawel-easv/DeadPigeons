@@ -1,11 +1,44 @@
 {
-  "x-generator": "NSwag v14.6.2.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))",
+  "x-generator": "NSwag v14.6.3.0 (NJsonSchema v11.5.2.0 (Newtonsoft.Json v13.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "My Title",
     "version": "1.0.0"
   },
   "paths": {
+    "/SetupFirstAdmin": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "Auth_SetupFirstAdmin",
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequestDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/Login": {
       "post": {
         "tags": [
@@ -90,24 +123,23 @@
         }
       }
     },
-    "/GetBooks": {
-      "post": {
+    "/api/Boards": {
+      "get": {
         "tags": [
-          "Library"
+          "Boards"
         ],
-        "operationId": "Library_GetBooks",
-        "requestBody": {
-          "x-name": "sieveModel",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SieveModel"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
+        "operationId": "Boards_GetMyBoards",
+        "parameters": [
+          {
+            "name": "includeDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 1
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -116,7 +148,165 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Book"
+                    "$ref": "#/components/schemas/Board"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Boards"
+        ],
+        "operationId": "Boards_CreateBoard",
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBoardDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Board"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Boards/GetBoard": {
+      "get": {
+        "tags": [
+          "Boards"
+        ],
+        "operationId": "Boards_GetBoard",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Board"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Boards/UpdateBoard": {
+      "put": {
+        "tags": [
+          "Boards"
+        ],
+        "operationId": "Boards_UpdateBoard",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBoardDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Board"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Boards/DeleteBoard": {
+      "delete": {
+        "tags": [
+          "Boards"
+        ],
+        "operationId": "Boards_DeleteBoard",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Boards/GetActiveRepeatingBoards": {
+      "get": {
+        "tags": [
+          "Boards"
+        ],
+        "operationId": "Boards_GetActiveRepeatingBoards",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Board"
                   }
                 }
               }
@@ -125,79 +315,477 @@
         }
       }
     },
-    "/CreateBook": {
-      "post": {
+    "/api/Boards/GetBoardsForCurrentGameWeek": {
+      "get": {
         "tags": [
-          "Library"
+          "Boards"
         ],
-        "operationId": "Library_CreateBook",
-        "requestBody": {
-          "x-name": "dto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateBookRequestDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Book"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/UpdateBook": {
-      "put": {
-        "tags": [
-          "Library"
-        ],
-        "operationId": "Library_UpdateBook",
-        "requestBody": {
-          "x-name": "dto",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBookRequestDto"
-              }
-            }
-          },
-          "required": true,
-          "x-position": 1
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Book"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/DeleteBook": {
-      "delete": {
-        "tags": [
-          "Library"
-        ],
-        "operationId": "Library_DeleteBook",
+        "operationId": "Boards_GetBoardsForCurrentGameWeek",
         "parameters": [
           {
-            "name": "bookId",
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "week",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Board"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/GetCurrentGame": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_GetCurrentGame",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Game"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/GetAllGames": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_GetAllGames",
+        "parameters": [
+          {
+            "name": "includeDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Game"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/GetGameById": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_GetGameById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Game"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/GetGamesByYear": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_GetGamesByYear",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "includeDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Game"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/GetGameByWeekAndYear": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_GetGameByWeekAndYear",
+        "parameters": [
+          {
+            "name": "week",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Game"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/CreateGame": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_CreateGame",
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGameDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Game"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/SetWinningNumbers": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_SetWinningNumbers",
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetWinningNumbersDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Game"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/ActivateGame": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_ActivateGame",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Game"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/DeleteGame": {
+      "delete": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_DeleteGame",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "permanent",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/RestoreGame": {
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_RestoreGame",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Games/GetGameStats": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "Games_GetGameStats",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameStatsDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/GetAllUsers": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_GetAllUsers",
+        "parameters": [
+          {
+            "name": "includeDeleted",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/GetUserById": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_GetUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/GetUserByEmail": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_GetUserByEmail",
+        "parameters": [
+          {
+            "name": "email",
             "in": "query",
             "schema": {
               "type": "string"
@@ -211,7 +799,199 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Book"
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/GetBalanceById": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_GetBalanceById",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number",
+                  "format": "decimal"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/UpdateUser": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_UpdateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "dto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/DeleteUser": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_DeleteUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "permanent",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/RestoreUser": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_RestoreUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Users/ChangePassword": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "Users_ChangePassword",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "guid"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
                 }
               }
             }
@@ -222,6 +1002,35 @@
   },
   "components": {
     "schemas": {
+      "RegisterRequestDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        }
+      },
       "JwtResponse": {
         "type": "object",
         "additionalProperties": false,
@@ -243,227 +1052,386 @@
           }
         }
       },
-      "RegisterRequestDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8
-          }
-        }
-      },
       "JwtClaims": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "role": {
             "type": "string"
           }
         }
       },
-      "Book": {
+      "Board": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "format": "guid"
           },
-          "title": {
-            "type": "string"
+          "userId": {
+            "type": "string",
+            "format": "guid"
           },
-          "pages": {
+          "numbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "price": {
             "type": "integer",
             "format": "int32"
           },
-          "createdat": {
+          "repeating": {
+            "type": "boolean"
+          },
+          "createdAt": {
             "type": "string",
             "format": "date-time"
           },
-          "genreid": {
+          "updatedAt": {
             "type": "string",
+            "format": "date-time"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "gameId": {
+            "type": "string",
+            "format": "guid",
             "nullable": true
           },
-          "genre": {
+          "game": {
             "nullable": true,
             "oneOf": [
               {
-                "$ref": "#/components/schemas/Genre"
+                "$ref": "#/components/schemas/Game"
               }
             ]
           },
-          "authors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Author"
-            }
+          "user": {
+            "$ref": "#/components/schemas/User"
           }
         }
       },
-      "Genre": {
+      "Game": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "createdat": {
             "type": "string",
-            "format": "date-time"
+            "format": "guid"
           },
-          "books": {
+          "week": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "winningNumbers": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "boards": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Book"
+              "$ref": "#/components/schemas/Board"
             }
           }
         }
       },
-      "Author": {
+      "User": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "id": {
+            "type": "string",
+            "format": "guid"
+          },
+          "deleted": {
+            "type": "boolean"
+          },
+          "firstName": {
             "type": "string"
           },
-          "name": {
+          "lastName": {
             "type": "string"
           },
-          "createdat": {
+          "email": {
+            "type": "string"
+          },
+          "createdAt": {
             "type": "string",
             "format": "date-time"
           },
-          "books": {
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "role": {
+            "type": "string"
+          },
+          "salt": {
+            "type": "string",
+            "format": "guid"
+          },
+          "passwordHash": {
+            "type": "string"
+          },
+          "boards": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Book"
+              "$ref": "#/components/schemas/Board"
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
             }
           }
         }
       },
-      "SieveModel": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/SieveModelOfFilterTermAndSortTerm"
-          },
-          {
-            "type": "object",
-            "additionalProperties": false
-          }
-        ]
-      },
-      "SieveModelOfFilterTermAndSortTerm": {
+      "Transaction": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "filters": {
+          "id": {
             "type": "string",
-            "nullable": true
+            "format": "guid"
           },
-          "sorts": {
+          "userId": {
             "type": "string",
+            "format": "guid",
             "nullable": true
           },
-          "page": {
+          "amount": {
             "type": "integer",
-            "format": "int32",
-            "maximum": 2147483647.0,
-            "minimum": 1.0,
+            "format": "int32"
+          },
+          "mobilepayReference": {
+            "type": "string"
+          },
+          "approved": {
+            "type": "boolean",
             "nullable": true
           },
-          "pageSize": {
-            "type": "integer",
-            "format": "int32",
-            "maximum": 2147483647.0,
-            "minimum": 1.0,
-            "nullable": true
-          }
-        }
-      },
-      "CreateBookRequestDto": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "pages",
-          "title"
-        ],
-        "properties": {
-          "pages": {
-            "type": "integer",
-            "format": "int32",
-            "maximum": 2147483647.0,
-            "minimum": 1.0
-          },
-          "title": {
+          "createdAt": {
             "type": "string",
-            "minLength": 1
+            "format": "date-time",
+            "nullable": true
+          },
+          "deleted": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "boardId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "user": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ]
           }
         }
       },
-      "UpdateBookRequestDto": {
+      "CreateBoardDto": {
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "bookIdForLookupReference",
-          "newPageCount",
-          "newTitle",
-          "authorsIds"
+          "userId",
+          "gameId",
+          "price",
+          "repeating"
         ],
         "properties": {
-          "bookIdForLookupReference": {
+          "userId": {
             "type": "string",
+            "format": "guid",
             "minLength": 1
           },
-          "newPageCount": {
-            "type": "integer",
-            "format": "int32",
-            "maximum": 2147483647.0,
-            "minimum": 1.0
-          },
-          "newTitle": {
+          "gameId": {
             "type": "string",
+            "format": "guid",
             "minLength": 1
           },
-          "authorsIds": {
+          "numbers": {
             "type": "array",
+            "maxItems": 8,
+            "minItems": 5,
             "items": {
-              "type": "string"
+              "type": "integer",
+              "format": "int32"
             }
           },
-          "genreId": {
-            "type": "string",
-            "nullable": true
+          "price": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 2147483647.0,
+            "minimum": 0.0
+          },
+          "repeating": {
+            "type": "boolean"
           }
         }
       },
-      "SieveConstants": {
+      "UpdateBoardDto": {
         "type": "object",
-        "description": "String constants from SieveConstants",
+        "additionalProperties": false,
+        "required": [
+          "numbers"
+        ],
+        "properties": {
+          "numbers": {
+            "type": "array",
+            "maxItems": 8,
+            "minItems": 5,
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 1000.0,
+            "minimum": 10.0
+          },
+          "repeating": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateGameDto": {
+        "type": "object",
         "additionalProperties": false,
         "properties": {
-          "GenreName": {
-            "type": "string",
-            "readOnly": true,
-            "description": "Constant value: \"GenreName\"",
-            "default": "GenreName"
+          "week": {
+            "type": "integer",
+            "format": "int32"
           },
-          "GenreId": {
-            "type": "string",
-            "readOnly": true,
-            "description": "Constant value: \"GenreId\"",
-            "default": "GenreId"
+          "year": {
+            "type": "integer",
+            "format": "int32"
           }
-        },
-        "x-constant-values": {
-          "GenreName": "GenreName",
-          "GenreId": "GenreId"
+        }
+      },
+      "SetWinningNumbersDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "gameId": {
+            "type": "string",
+            "format": "guid"
+          },
+          "winningNumbers": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "GameStatsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "totalBoards": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalRevenue": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "activeRepeatingBoards": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pendingTransactions": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "firstName",
+          "lastName",
+          "email",
+          "role"
+        ],
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
         }
       }
     }

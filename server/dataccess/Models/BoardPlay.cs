@@ -11,11 +11,11 @@ public partial class BoardPlay
 
     public Guid GameId { get; set; }
 
-    public bool? IsWinner { get; set; }
+    public bool IsWinner { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public bool? Deleted { get; set; }
+    public bool Deleted { get; set; }
 
     public virtual Board Board { get; set; } = null!;
 

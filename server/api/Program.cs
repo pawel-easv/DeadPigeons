@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using api.Controllers;
 using api.Etc;
 using api.Services;
 using Scalar.AspNetCore;
@@ -19,12 +20,22 @@ public class Program
             opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             opts.JsonSerializerOptions.MaxDepth = 128;
         });
-        services.AddOpenApiDocument(config => { config.AddStringConstants(typeof(SieveConstants)); });
+        
+        services.AddOpenApiDocument();
         services.AddCors();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<ISeeder, SieveTestSeeder>();
+        services.AddScoped<IGameService, GameService>();
+        services.AddScoped<IBoardService, BoardService>();
+
+        services.AddScoped<ISeeder, GameSeeder>();
+        
+        // services.AddScoped<ISeeder, DefaultAdminSeeder>();
         services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddControllers().AddJsonOptions(opts =>
+        {
+            opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        });
         services.Configure<SieveOptions>(options =>
         {
             options.CaseSensitive = false;
@@ -48,12 +59,13 @@ public class Program
         app.UseCors(config => config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin().SetIsOriginAllowed(x => true));
         app.MapControllers();
         app.GenerateApiClientsFromOpenApi("/../../client/src/core/generated-client.ts").GetAwaiter().GetResult();
-        if (app.Environment.IsDevelopment())
-            using (var scope = app.Services.CreateScope())
-            {
-                scope.ServiceProvider.GetRequiredService<ISeeder>().Seed().GetAwaiter().GetResult();
-            }
-
+        // if (app.Environment.IsDevelopment())
+        //     using (var scope = app.Services.CreateScope())
+        //     {
+        //         scope.ServiceProvider.GetRequiredService<ISeeder>().Seed().GetAwaiter().GetResult();
+        //     }
+        
         app.Run();
+        
     }
 }
