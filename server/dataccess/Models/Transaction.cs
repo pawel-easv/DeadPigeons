@@ -19,7 +19,7 @@ public partial class Transaction
 
     public bool? Deleted { get; set; }
 
-    public Guid BoardId { get; set; }
+    public Guid? BoardId { get; set; }
 
     public virtual User? User { get; set; }
 }

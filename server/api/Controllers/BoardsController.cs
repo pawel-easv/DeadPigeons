@@ -1,9 +1,10 @@
+using System.Security.Claims;
+using api.Models;
 using api.Models.Requests;
 using api.Services;
 using dataccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 namespace api.Controllers;
 
@@ -12,14 +13,14 @@ namespace api.Controllers;
 public class BoardsController : ControllerBase
 {
     private readonly IBoardService _boardService;
-    private readonly Guid _userId;
 
     public BoardsController(IBoardService boardService)
     {
         _boardService = boardService;
     }
 
-    private Guid CurrentUserId => _userId;
+    private Guid CurrentUserId => Guid.Parse(User.FindFirst("Id")?.Value 
+                                             ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
 
     [HttpGet]
     public async Task<IEnumerable<Board>> GetMyBoards([FromQuery] bool includeDeleted = false)
@@ -28,71 +29,31 @@ public class BoardsController : ControllerBase
     [HttpGet(nameof(GetBoard))]
     public async Task<Board> GetBoard(Guid id)
     {
-        try
-        {
-            return await _boardService.GetBoardByIdAsync(id, CurrentUserId);
-        }
-        catch (KeyNotFoundException)
-        {
-            throw new KeyNotFoundException("Board not found or you don't have permission.");
-        }
+        return await _boardService.GetBoardByIdAsync(id, CurrentUserId);
     }
     
     [HttpPost]
     public async Task<Board> CreateBoard([FromBody] CreateBoardDto dto)
     {
-        try
-        {
-            var board = await _boardService.CreateBoard(dto);
-            return board;
-        }
-        catch (ValidationException ex)
-        {
-            throw new ValidationException(ex.Message);
-        }
+        // Ensure the board is created for the current user
+        dto.UserId = CurrentUserId;
+        return await _boardService.CreateBoard(dto);
     }
 
     [HttpPut(nameof(UpdateBoard))]
     public async Task<Board> UpdateBoard(Guid id, [FromBody] UpdateBoardDto dto)
     {
-        try
-        {
-            var board = await _boardService.UpdateBoardAsync(id, dto, CurrentUserId);
-            return board;
-        }
-        catch (KeyNotFoundException)
-        {
-            throw  new KeyNotFoundException("Board not found or you don't have permission.");
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new InvalidOperationException(ex.Message);
-        }
-        catch (ValidationException ex)
-        {
-            throw new ValidationException(ex.Message);
-        }
+        return await _boardService.UpdateBoardAsync(id, dto, CurrentUserId);
     }
     
     [HttpDelete(nameof(DeleteBoard))]
-    public async Task<bool> DeleteBoard(Guid id)
+    public async Task DeleteBoard(Guid id)
     {
-        try
-        {
-            await _boardService.DeleteBoardAsync(id, CurrentUserId);
-            return true;
-        }
-        catch (KeyNotFoundException)
-        {
-            throw new  KeyNotFoundException("Board not found or you don't have permission.");
-        }
-        catch (InvalidOperationException ex)
-        {
-            throw new  InvalidOperationException(ex.Message);
-        }
+        await _boardService.DeleteBoardAsync(id, CurrentUserId);
     }
     
     [HttpGet(nameof(GetActiveRepeatingBoards))]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IEnumerable<Board>> GetActiveRepeatingBoards()
         => await _boardService.GetActiveRepeatingBoardsAsync();
 

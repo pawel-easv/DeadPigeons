@@ -5,14 +5,12 @@ import HomeIcon from "../../../assets/home-icon.svg";
 import { useAtom } from "jotai";
 import { UserBalanceAtom } from "@core/atoms/atoms.ts";
 import { useState } from "react";
-import toast from "react-hot-toast";
 
 export default function SideMenu() {
     const [userBalance] = useAtom(UserBalanceAtom);
     const [showAddBalance, setShowAddBalance] = useState(false);
 
     const handleAddBalance = () => {
-        toast.success("Add balance feature coming soon!");
     };
 
     return (
@@ -54,12 +52,14 @@ export default function SideMenu() {
                 <div className="text-xl">
                     <span>Balance: {userBalance} DKK</span>
                 </div>
-                <button
+                <NavLink
+                    to="/home/balance"
+
                     onClick={handleAddBalance}
                     className="btn btn-primary bg-green-600 border-0 hover:bg-green-700"
                 >
                     Add balance
-                </button>
+                </NavLink>
             </div>
         </div>
     );

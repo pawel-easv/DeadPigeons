@@ -7,8 +7,8 @@ export const customFetch = {
         const headers = new Headers(init?.headers);
 
         if (token) {
-            // Your backend expects just the token, NOT "Bearer {token}"
-            headers.set('Authorization', token);
+            // Standard JWT format: "Bearer {token}"
+            headers.set('Authorization', `Bearer ${token}`);
         }
 
         return fetch(url, {

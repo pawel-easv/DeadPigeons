@@ -9,6 +9,8 @@ import UsersOverview from "@components/routes/admin/UsersOverview.tsx";
 import LotteryDashboard from "@components/routes/admin/LotteryDashboard.tsx";
 import Dashboard from "@components/routes/user/Dashboard.tsx";
 import BuyBoardPage from "@components/routes/user/BuyBoardPage.tsx";
+import TransactionHistory from "@components/routes/user/TransactionHistory.tsx";
+import {AddBalanceModal} from "@components/routes/user/AddBalanceModal.tsx";
 
 export const AdminViewPath = "/admin/";
 export const AdminDashboardPath = "/admin/dashboard";
@@ -42,6 +44,18 @@ function App() {
                             path: "buy-board",
                             element: <BuyBoardPage />
                         },
+                        {
+                            path: "history",
+                            element: <TransactionHistory/>
+                        },
+                        {
+                            path: "balance",
+                            element:     <AddBalanceModal
+                                onClose={() => {}}
+                                onSuccess={() => {
+                                }}
+                            />
+                        }
                     ]
                 },
                 {

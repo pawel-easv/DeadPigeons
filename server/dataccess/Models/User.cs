@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace dataccess.Models;
 
@@ -24,7 +25,8 @@ public partial class User
     public string Role { get; set; } = null!;
 
     public Guid Salt { get; set; }
-
+    
+    [JsonIgnore]
     public string PasswordHash { get; set; } = null!;
 
     public virtual ICollection<Board> Boards { get; set; } = new List<Board>();

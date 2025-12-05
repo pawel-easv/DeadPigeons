@@ -5,6 +5,7 @@ import { GamesClient } from "@core/generated-client.ts";
 import customCatch from "@core/customCatch.ts";
 import toast from "react-hot-toast";
 import { resolveRefs } from "dotnet-json-refs";
+import {customFetch} from "@utilities/customFetch.ts";
 
 const isProduction = import.meta.env.PROD;
 const prod = "https://yourproductionserver.com";
@@ -58,7 +59,7 @@ class GamesClientWithResolvedRefs extends GamesClient {
     }
 }
 
-const gameClient = new GamesClientWithResolvedRefs(finalUrl);
+const gameClient = new GamesClientWithResolvedRefs(finalUrl, customFetch);
 
 export default function gameApi() {
     const [allGames, setAllGames] = useAtom(AllGamesAtom);

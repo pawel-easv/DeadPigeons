@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 using api.Models;
 using api.Models.Requests;
 using dataccess;
@@ -11,7 +11,6 @@ using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Serializers;
 using Microsoft.EntityFrameworkCore;
-using ValidationException = Bogus.ValidationException;
 
 namespace api.Services;
 
@@ -23,44 +22,61 @@ public class AuthService(
 {
     public async Task<JwtClaims> VerifyAndDecodeToken(string token)
     {
-        if (token == null)
-            throw new ValidationException("No token attached!");
+        if (string.IsNullOrEmpty(token))
+            throw new ValidationException("No token provided!");
+
+        // Remove "Bearer " prefix if present
+        if (token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            token = token.Substring(7);
+        }
 
         var builder = CreateJwtBuilder();
 
-        string jsonString;
         try
         {
-            jsonString = builder.Decode(token)
-                         ?? throw new ValidationException("Authentication failed!");
+            var json = builder.Decode(token) 
+                       ?? throw new ValidationException("Authentication failed!");
+            
+            var payload = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+            
+            if (payload == null)
+                throw new ValidationException("Invalid token payload!");
+
+            // Extract Id claim (could be under different keys)
+            var userId = payload.ContainsKey("Id") ? payload["Id"].ToString()
+                       : payload.ContainsKey(ClaimTypes.NameIdentifier) ? payload[ClaimTypes.NameIdentifier].ToString()
+                       : throw new ValidationException("User ID not found in token!");
+
+            var role = payload.ContainsKey("Role") ? payload["Role"].ToString()
+                     : payload.ContainsKey(ClaimTypes.Role) ? payload[ClaimTypes.Role].ToString()
+                     : "User";
+
+            var claims = new JwtClaims(Guid.Parse(userId), role);
+
+            // Verify user still exists
+            var userExists = await ctx.Users.AnyAsync(u => u.Id == claims.Id && !u.Deleted);
+            if (!userExists)
+                throw new ValidationException("User not found or has been deleted!");
+
+            return claims;
         }
         catch (Exception e)
         {
-            logger.LogError(e.Message, e);
-            throw new ValidationException("Valided to verify JWT");
+            logger.LogError(e, "Failed to verify JWT");
+            throw new ValidationException("Failed to verify JWT");
         }
-
-        var jwtClaims = JsonSerializer.Deserialize<JwtClaims>(jsonString, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        }) ?? throw new ValidationException("Authentication failed!");
-
-        _ = ctx.Users.FirstOrDefault(u => u.Id == jwtClaims.Id)
-            ?? throw new ValidationException("Authentication is valid, but user is not found!");
-
-        return jwtClaims;
     }
 
     public async Task<JwtResponse> Login(LoginRequestDto dto)
     {
-        var user = ctx.Users.FirstOrDefault(u => u.Email == dto.Email)
-                   ?? throw new ValidationException("User is not found!");
-        var passwordsMatch = user.PasswordHash==
-                             SHA512.HashData(
-                                     Encoding.UTF8.GetBytes(dto.Password + user.Salt))
-                                 .Aggregate("", (current, b) => current + b.ToString("x2"));
-        if (!passwordsMatch)
-            throw new ValidationException("Password is incorrect!");
+        var user = await ctx.Users.FirstOrDefaultAsync(u => u.Email == dto.Email && !u.Deleted)
+                   ?? throw new ValidationException("Invalid email or password!");
+        
+        var passwordHash = HashPassword(dto.Password, user.Salt);
+        
+        if (passwordHash != user.PasswordHash)
+            throw new ValidationException("Invalid email or password!");
 
         var token = CreateJwt(user);
         return new JwtResponse(token);
@@ -68,19 +84,15 @@ public class AuthService(
 
     public async Task<JwtResponse> Register(RegisterRequestDto dto)
     {
-        // Validate input DTO
         Validator.ValidateObject(dto, new ValidationContext(dto), true);
 
-        // Check if email is taken
-        if (ctx.Users.Any(u => u.Email == dto.Email))
+        if (await ctx.Users.AnyAsync(u => u.Email == dto.Email && !u.Deleted))
             throw new ValidationException("Email is already taken");
 
-        // Generate salt & hash password
         var salt = Guid.NewGuid();
-        var hashBytes = SHA512.HashData(Encoding.UTF8.GetBytes(dto.Password + salt));
-        var passwordHash = string.Concat(hashBytes.Select(b => b.ToString("x2")));
+        var passwordHash = HashPassword(dto.Password, salt);
 
-        var user = new User()
+        var user = new User
         {
             Id = Guid.NewGuid(),
             FirstName = dto.FirstName,
@@ -96,8 +108,8 @@ public class AuthService(
         ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
 
-        var tokenForUser = CreateJwt(user);
-        return new JwtResponse(tokenForUser);
+        var token = CreateJwt(user);
+        return new JwtResponse(token);
     }
 
     public async Task<JwtResponse> CreateFirstAdminIfNoneExists(RegisterRequestDto dto)
@@ -113,8 +125,7 @@ public class AuthService(
             throw new ValidationException("First admin password must be at least 8 characters.");
 
         var salt = Guid.NewGuid();
-        var hashBytes = SHA512.HashData(Encoding.UTF8.GetBytes(dto.Password + salt));
-        var passwordHash = string.Concat(hashBytes.Select(b => b.ToString("x2")));
+        var passwordHash = HashPassword(dto.Password, salt);
 
         var admin = new User
         {
@@ -124,7 +135,7 @@ public class AuthService(
             Email = dto.Email.ToLowerInvariant().Trim(),
             Salt = salt,
             PasswordHash = passwordHash,
-            Role = "Admin",
+            Role = Roles.Admin,
             CreatedAt = DateTime.UtcNow,
             Deleted = false
         };
@@ -135,6 +146,7 @@ public class AuthService(
         var token = CreateJwt(admin);
         return new JwtResponse(token);
     }
+    
     private JwtBuilder CreateJwtBuilder()
     {
         return JwtBuilder.Create()
@@ -147,10 +159,23 @@ public class AuthService(
 
     private string CreateJwt(User user)
     {
+        var expirationTime = timeProvider.GetUtcNow().AddDays(7).ToUnixTimeSeconds();
+    
         return CreateJwtBuilder()
-            .AddClaim(nameof(User.Id), user.Id)
-            .AddClaim(nameof(User.Role), user.Role)
+            .AddClaim(ClaimTypes.NameIdentifier, user.Id.ToString())
+            .AddClaim("Id", user.Id.ToString())  
+            .AddClaim(ClaimTypes.Role, user.Role)
+            .AddClaim("Role", user.Role)
+            .AddClaim(ClaimTypes.Email, user.Email)
+            .AddClaim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}")
+            .AddClaim("exp", expirationTime)
+            .AddClaim("iat", timeProvider.GetUtcNow().ToUnixTimeSeconds()) 
             .Encode();
     }
-
+    
+    private string HashPassword(string password, Guid salt)
+    {
+        var hashBytes = SHA512.HashData(Encoding.UTF8.GetBytes(password + salt));
+        return string.Concat(hashBytes.Select(b => b.ToString("x2")));
+    }
 }

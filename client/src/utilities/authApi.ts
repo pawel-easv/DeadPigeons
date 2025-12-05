@@ -42,8 +42,6 @@ export default function authApi() {
             setToken(result.token);
             setIsAuthenticated(true);
 
-            // Don't call whoAmI here - let it be called separately
-            // The token needs to be properly set first
             toast.success("Login successful");
 
             return result;

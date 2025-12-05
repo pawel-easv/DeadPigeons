@@ -5,6 +5,7 @@ import {UsersClient} from "@core/generated-client.ts";
 import customCatch from "@core/customCatch.ts";
 import toast from "react-hot-toast";
 import {resolveRefs} from "dotnet-json-refs";
+import { customFetch } from "@utilities/customFetch.ts"; // Import customFetch
 
 const isProduction = import.meta.env.PROD;
 const prod = "https://yourproductionserver.com";
@@ -33,7 +34,7 @@ class UsersClientWithResolvedRefs extends UsersClient {
     }
 }
 
-const userClient = new UsersClientWithResolvedRefs(finalUrl);
+const userClient = new UsersClientWithResolvedRefs(finalUrl, customFetch);
 
 export default function userApi() {
     const [users, setUsers] = useAtom(AllUsersAtom);
@@ -116,6 +117,7 @@ export default function userApi() {
             customCatch(e);
         }
     }
+
     async function getBalanceById(id: string): Promise<number|undefined> {
         try{
             return await userClient.getBalanceById(id);

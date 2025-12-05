@@ -21,21 +21,19 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            const response = await auth.login({
+            const loginResponse = await auth.login({
                 email,
                 password
             });
 
-            if (!response?.token) {
+            if (!loginResponse?.token) {
                 toast.error("Login failed. Please try again.");
                 setIsLoading(false);
                 return;
             }
 
-            // Wait a tiny bit for token to be set in localStorage
-            await new Promise(resolve => setTimeout(resolve, 100));
+            toast.success("Login successful!");
 
-            // Now get user info
             const user = await auth.whoAmI();
 
             if (!user) {
@@ -44,23 +42,29 @@ export default function Login() {
                 return;
             }
 
-            // Navigate based on role
             if (user.role === "Admin") {
                 navigate(AdminDashboardPath);
             } else {
                 navigate(UserViewPath);
             }
 
-        } catch (err) {
+        } catch (err: any) {
             console.error("Login error:", err);
-            toast.error("Invalid email or password");
+
+            if (err?.response?.status === 401) {
+                toast.error("Invalid email or password");
+            } else if (err?.message) {
+                toast.error(err.message);
+            } else {
+                toast.error("Login failed. Please try again.");
+            }
         } finally {
             setIsLoading(false);
         }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !isLoading) {
             handleLogin();
         }
     };
@@ -85,6 +89,7 @@ export default function Login() {
                         onKeyPress={handleKeyPress}
                         disabled={isLoading}
                         autoComplete="email"
+                        placeholder="your@email.com"
                     />
                 </div>
 
@@ -98,6 +103,7 @@ export default function Login() {
                         onKeyPress={handleKeyPress}
                         disabled={isLoading}
                         autoComplete="current-password"
+                        placeholder="••••••••"
                     />
                 </div>
 
